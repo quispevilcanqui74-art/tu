@@ -1,0 +1,54 @@
+#!/bin/sh
+# ---------------------------------------------------------------------------
+# Lanzador de Gradle del proyecto Nosotros.
+#
+# El wrapper oficial necesita "gradle/wrapper/gradle-wrapper.jar", que es un
+# binario y no se versiona en este repositorio. Este script hace el mismo
+# trabajo con lo que ya trae la máquina: usa el Gradle instalado si existe y,
+# si no, descarga la versión 8.7 una sola vez en la caché del usuario.
+#
+# Uso:
+#   ./gradlew assembleDebug
+#   ./gradlew assembleRelease
+# ---------------------------------------------------------------------------
+set -e
+
+VERSION="8.7"
+CACHE="${GRADLE_USER_HOME:-$HOME/.gradle}/wrapper/dists/nosotros-$VERSION"
+GRADLE_BIN="$CACHE/gradle-$VERSION/bin/gradle"
+ZIP="$CACHE/gradle-$VERSION-bin.zip"
+URL="https://services.gradle.org/distributions/gradle-$VERSION-bin.zip"
+
+if [ -x "$GRADLE_BIN" ]; then
+    exec "$GRADLE_BIN" "$@"
+fi
+
+if command -v gradle >/dev/null 2>&1; then
+    echo "Usando el Gradle instalado en el sistema."
+    exec gradle "$@"
+fi
+
+echo "Descargando Gradle $VERSION (solo la primera vez)..."
+mkdir -p "$CACHE"
+
+if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$URL" -o "$ZIP"
+elif command -v wget >/dev/null 2>&1; then
+    wget -q "$URL" -O "$ZIP"
+else
+    echo "ERROR: se necesita curl o wget para descargar Gradle." >&2
+    exit 1
+fi
+
+if command -v unzip >/dev/null 2>&1; then
+    unzip -q "$ZIP" -d "$CACHE"
+elif command -v python3 >/dev/null 2>&1; then
+    python3 -m zipfile -e "$ZIP" "$CACHE"
+else
+    echo "ERROR: se necesita unzip o python3 para descomprimir Gradle." >&2
+    exit 1
+fi
+
+rm -f "$ZIP"
+chmod +x "$GRADLE_BIN" 2>/dev/null || true
+exec "$GRADLE_BIN" "$@"

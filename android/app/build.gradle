@@ -1,0 +1,76 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'pe.nosotros.album'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "pe.nosotros.album"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+        release {
+            // APK sin firmar: para publicar hay que crear un keystore
+            // y añadir signingConfigs.
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    // WebViewAssetLoader sirve la web desde https://appassets.androidplatform.net,
+    // un origen seguro de verdad. Con file:// el WebView no permite IndexedDB
+    // y el álbum no podría guardar fotos ni videos.
+    implementation 'androidx.webkit:webkit:1.11.0'
+}
+
+// ---------------------------------------------------------------------------
+// La aplicación web vive en la raíz de la carpeta (index.html, css/, js/).
+// En cada compilación se copia a assets/www para no duplicar código fuente.
+// ---------------------------------------------------------------------------
+def contenidoWeb = rootProject.projectDir.parentFile
+
+if (!new File(contenidoWeb, 'index.html').exists()) {
+    throw new GradleException(
+        "No se encontró index.html en '${contenidoWeb}'. " +
+        "La carpeta 'android/' debe estar junto a index.html, css/ y js/."
+    )
+}
+
+tasks.register('copiarWeb', Copy) {
+    description = 'Copia la aplicación web dentro de app/src/main/assets/www'
+    from(contenidoWeb) {
+        include 'index.html'
+        include 'manifest.webmanifest'
+        include 'icono.svg'
+        include 'sw.js'
+        include 'css/**'
+        include 'js/**'
+    }
+    into file('src/main/assets/www')
+}
+
+tasks.named('preBuild').configure {
+    dependsOn 'copiarWeb'
+}

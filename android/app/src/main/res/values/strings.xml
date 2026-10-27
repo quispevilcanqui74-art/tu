@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Nosotros</string>
+    <string name="pulsa_para_salir">Pulsa atrás otra vez para salir</string>
+    <string name="no_se_pudo_abrir">No se pudo abrir el enlace</string>
+    <string name="elegir_archivos">Elige las fotos o los videos</string>
+    <string name="no_hay_selector">No hay una aplicación para elegir archivos</string>
+    <string name="no_se_pudo_guardar">No se pudo guardar el archivo</string>
+    <string name="archivo_muy_grande">El archivo es muy grande para guardarlo fuera de la app</string>
+    <string name="guardado_en_descargas">%1$s guardado en Descargas/Nosotros</string>
+    <string name="guardado_en_carpeta">Guardado en %1$s</string>
+</resources>

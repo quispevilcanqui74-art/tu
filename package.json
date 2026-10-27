@@ -1,0 +1,10 @@
+{
+  "name": "nosotros-pareja",
+  "version": "1.0.0",
+  "description": "Álbum y diario digital de pareja: fotos, videos, fechas, cartas y deseos en un solo lugar, sin servidor.",
+  "private": true,
+  "scripts": {
+    "test": "node tests/smoke.test.js",
+    "check": "node tests/smoke.test.js"
+  }
+}
